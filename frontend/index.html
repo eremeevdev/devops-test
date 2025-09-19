@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Interview Task</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; flex-direction: column;}
+        #container { border: 1px solid #ccc; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Frontend</h1>
+        <img src="/static/placeholder.svg" alt="Placeholder Image" style="margin-top: 1rem; margin-bottom: 1rem;">
+        <p><strong>Text from backend:</strong></p>
+        <p id="backend-text"><em>Loading...</em></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const textElement = document.getElementById('backend-text');
+            
+            // Этот запрос будет работать, когда Nginx настроен 
+            // для проксирования /api/ на бэкенд
+            fetch('/api/v1/text')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    textElement.textContent = data.text;
+                })
+                .catch(error => {
+                    textElement.textContent = `Failed to load text. Is Nginx configured correctly? Error: ${error}`;
+                    console.error('Error fetching data:', error);
+                });
+        });
+    </script>
+</body>
+</html>
