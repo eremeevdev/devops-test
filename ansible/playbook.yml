@@ -1,0 +1,59 @@
+---
+- name: Configure DB server
+  hosts: db
+  become: true
+  vars_files:
+    - group_vars/db.yml
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install MySQL server
+      apt:
+        name: mysql-server
+        state: present
+
+    - name: Start and enable MySQL
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: Install PyMySQL (needed by Ansible mysql modules)
+      apt:
+        name: python3-pymysql
+        state: present
+
+    - name: Create MySQL application user
+      community.mysql.mysql_user:
+        name: "{{ mysql_user }}"
+        password: "{{ mysql_password }}"
+        priv: "*.*:ALL"
+        host: "%"
+        state: present
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+
+    - name: Allow port 3306 only from localhost (iptables)
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: "3306"
+        source: "127.0.0.1"
+        jump: ACCEPT
+
+    - name: Drop all other connections to port 3306
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: "3306"
+        jump: DROP
+
+    - name: Install iptables-persistent
+      apt:
+        name: iptables-persistent
+        state: present
+
+    - name: Save iptables rules
+      command: netfilter-persistent save
