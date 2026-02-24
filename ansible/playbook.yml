@@ -35,6 +35,15 @@
         state: present
         login_unix_socket: /var/run/mysqld/mysqld.sock
 
+    - name: Copy database setup script
+      copy:
+        src: db/setup.sql
+        dest: /tmp/setup.sql
+        mode: '0644'
+
+    - name: Run database setup script
+      shell: mysql -u {{ mysql_user }} -p{{ mysql_password }} < /tmp/setup.sql
+
     - name: Allow port 3306 only from localhost (iptables)
       iptables:
         chain: INPUT

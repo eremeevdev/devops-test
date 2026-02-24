@@ -4,7 +4,7 @@
 APP_NAME := backend-app
 LINUX_APP_NAME := $(APP_NAME)-linux
 
-.PHONY: all build build-linux run clean
+.PHONY: all build build-linux run clean tidy
 
 # Default command
 all: build
@@ -31,3 +31,9 @@ clean:
 	@echo "Cleaning up binaries..."
 	rm -f $(APP_NAME) $(LINUX_APP_NAME)
 	@echo "Done."
+
+# Tidy Go dependencies
+tidy:
+	@echo "Running go mod tidy..."
+	go mod tidy
+	@echo "Dependencies tidied."
