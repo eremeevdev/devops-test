@@ -1,0 +1,2 @@
+token                = "YOUR_TIMEWEB_CLOUD_TOKEN_HERE"
+ssh_private_key_path = "~/.ssh/id_rsa"
